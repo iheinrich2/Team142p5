@@ -3,11 +3,15 @@ import java.util.List;
 public class NavigationGraph implements GraphADT<Location, Path> {
 
 	//TODO: Implement all methods of GraphADT
+	private List<GraphNode<Location, Path>> graph;
+	private String[] edgePropertyNames;
+	
 	
 	public NavigationGraph(String[] edgePropertyNames) {
+		this.edgePropertyNames = edgePropertyNames;
 	}
 
-	
+
 	/**
 	 * Returns a Location object given its name
 	 * 
@@ -16,7 +20,8 @@ public class NavigationGraph implements GraphADT<Location, Path> {
 	 * @return Location object
 	 */
 	public Location getLocationByName(String name) {
-		return null; //TODO: implement correctly. 
+		Location location = new Location(name);
+		return location; //TODO: implement correctly. 
 	}
 
 
@@ -30,7 +35,7 @@ public class NavigationGraph implements GraphADT<Location, Path> {
 	@Override
 	public void addEdge(Location src, Location dest, Path edge) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 
