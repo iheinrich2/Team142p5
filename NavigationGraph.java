@@ -1,4 +1,5 @@
 import java.util.List;
+import java.util.ArrayList;
 
 public class NavigationGraph implements GraphADT<Location, Path> {
 
@@ -9,6 +10,7 @@ public class NavigationGraph implements GraphADT<Location, Path> {
 	
 	public NavigationGraph(String[] edgePropertyNames) {
 		this.edgePropertyNames = edgePropertyNames;
+		graph = new ArrayList<GraphNode<Location, Path>>();
 	}
 
 
@@ -27,7 +29,9 @@ public class NavigationGraph implements GraphADT<Location, Path> {
 
 	@Override
 	public void addVertex(Location vertex) {
-		// TODO Auto-generated method stub
+		GraphNode<Location, Path> newVertex = 
+			new GraphNode(vertex, graph.size());
+		graph.add(newVertex);
 		
 	}
 
@@ -41,8 +45,14 @@ public class NavigationGraph implements GraphADT<Location, Path> {
 
 	@Override
 	public List<Location> getVertices() {
-		// TODO Auto-generated method stub
-		return null;
+		//New list to store the vertices to be returned
+		List<Location> vertices = new ArrayList<Location>();
+		
+		//Go through the graph and add all the vertices to the list
+		for(int i = 0; i < graph.size(); i++){
+			vertices.add(graph.get(i).getVertexData());
+		}
+		return vertices;
 	}
 
 
@@ -76,8 +86,7 @@ public class NavigationGraph implements GraphADT<Location, Path> {
 
 	@Override
 	public String[] getEdgePropertyNames() {
-		// TODO Auto-generated method stub
-		return null;
+		return edgePropertyNames;
 	}
 
 }
