@@ -1,5 +1,22 @@
+/////////////////////////////////////////////////////////////////////////////
+// Semester:         CS367 Spring 2016 
+// PROJECT:          P5
+// FILE:             MapApp.java
+//
+// TEAM:    p5team 142
+// Authors:
+// Author1: (Jarrett Benson, jbenson6@wisc.edu, jbenson6, Lec 002)
+// Author2: (Cameron Carlson, ccarlson24@wisc.edu, ccarlson, Lec 002) 
+// Author3: (Isaac Heinrich, iheinrich@wisc.edu, iheinrich, Lec 002)
+// Author4: (Evan Ogren, eogren@wisc.edu, eogren, Lec 002)
+// Author4: (Mitchel Abts, abts3@wisc.edu, abts3, Lec 003)
+//////////////////////////// 80 columns wide //////////////////////////////////
+
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,7 +43,7 @@ public class MapApp {
 		this.graphObject = graph;
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		if (args.length != 1) {
 			System.out.println("Usage: java MapApp <pathToGraphFile>");
 			System.exit(1);
@@ -133,10 +150,10 @@ public class MapApp {
 
 				String selectedPropertyName = propertyNames[selectedPropertyIndex];
 				List<Path> shortestRoute = graphObject.getShortestRoute(src, dest, selectedPropertyName);
-				for(Path path : shortestRoute) {
-					System.out.print(path.displayPathWithProperty(selectedPropertyIndex)+", ");
+				for (Path path : shortestRoute) {
+					System.out.print(path.displayPathWithProperty(selectedPropertyIndex) + ", ");
 				}
-				if(shortestRoute.size()==0) {
+				if (shortestRoute.size() == 0) {
 					System.out.print("No route exists");
 				}
 				System.out.println();
@@ -157,11 +174,10 @@ public class MapApp {
 
 	/**
 	 * Reads and parses the input file passed as argument create a
-	 * NavigationGraph object. The edge property names required for
-	 * the constructor can be got from the first line of the file
-	 * by ignoring the first 2 columns - source, destination. 
-	 * Use the graph object to add vertices and edges as
-	 * you read the input file.
+	 * NavigationGraph object. The edge property names required for the
+	 * constructor can be got from the first line of the file by ignoring the
+	 * first 2 columns - source, destination. Use the graph object to add
+	 * vertices and edges as you read the input file.
 	 * 
 	 * @param graphFilepath
 	 *            path to the input file
@@ -169,16 +185,66 @@ public class MapApp {
 	 * @throws FileNotFoundException
 	 *             if graphFilepath is not found
 	 * @throws InvalidFileException
-	 *             if header line in the file has < 3 columns or 
-	 *             if any line that describes an edge has different number of properties 
-	 *             	than as described in the header or 
-	 *             if any property value is not numeric 
+	 *             if header line in the file has < 3 columns or if any line
+	 *             that describes an edge has different number of properties
+	 *             than as described in the header or if any property value is
+	 *             not numeric
 	 */
 
-	public static NavigationGraph createNavigationGraphFromMapFile(String graphFilepath){
-			// TODO: read/parse the input file graphFilepath and create
-			// NavigationGraph with vertices and edges
-			return null;
+	public static NavigationGraph createNavigationGraphFromMapFile(String graphFilepath)
+			throws InvalidFileException, IOException {
+		// TODO: read/parse the input file graphFilepath and create
+		// NavigationGraph with vertices and edges
+		String[] line1Array;
+
+		FileReader fr = new FileReader(graphFilepath);
+		BufferedReader br = new BufferedReader(fr);
+
+		try {
+			String firstLine = br.readLine();
+			line1Array = firstLine.split(" ");
+		} catch (IOException excep) {
+			throw new InvalidFileException("File did not contain correct information format");
+		}
+
+		String[] edgeProperties = new String[line1Array.length - 2];
+
+		for (int i = 0; i < edgeProperties.length; i++) {
+			edgeProperties[i] = line1Array[i + 2];
+		}
+
+		NavigationGraph graph = new NavigationGraph(edgeProperties);
+		String[] lineArray = new String[line1Array.length];
+		String line;
+
+		while ((line = br.readLine()) != null) {
+
+			lineArray = line.split(" ");
+			Location firstLoc = new Location(lineArray[0].toLowerCase());
+			Location secondLoc = new Location(lineArray[1].toLowerCase());
+			graph.addVertex(firstLoc);
+			graph.addVertex(secondLoc);
+			ArrayList<Double> pathList = new ArrayList<Double>();
+
+			for (int i = 2; i < lineArray.length; i++) {
+
+				try {
+					pathList.add(Double.parseDouble(lineArray[i]));
+				} catch (NullPointerException nullie) {
+					throw new InvalidFileException("Index was messed up");
+				} catch (NumberFormatException numbie) {
+					throw new InvalidFileException("Check format of file.");
+				}
+			}
+
+			Path path = new Path(firstLoc, secondLoc, pathList);
+			graph.addEdge(firstLoc, secondLoc, path);
+		}
+
+		fr.close();
+		br.close();
+
+		return graph;
 
 	}
 
