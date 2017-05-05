@@ -1,3 +1,4 @@
+
 /////////////////////////////////////////////////////////////////////////////
 // Semester:         CS367 Spring 2016 
 // PROJECT:          P5
@@ -17,6 +18,12 @@ import java.util.PriorityQueue;
 import java.util.ArrayList;
 import java.util.Collections;
 
+/**
+ * This class handles the NavigationGraph as well as it's methods.
+ *
+ *
+ * @author Team 142
+ */
 public class NavigationGraph implements GraphADT<Location, Path> {
 
 	// TODO: Implement all methods of GraphADT
@@ -39,14 +46,15 @@ public class NavigationGraph implements GraphADT<Location, Path> {
 	 * @return Location object
 	 */
 	public Location getLocationByName(String name) {
-		
-		for (int i = 0; i < vertices; i++) {
 
+		for (int i = 0; i < vertices; i++) {
+			// searches the list for the vertex with name, then returns the
+			// vertex
 			if (graph.get(i).getVertexData().getName().equalsIgnoreCase(name)) {
 				return graph.get(i).getVertexData();
 			}
 		}
-
+		// returns null if the name doesn't exist
 		return null;
 	}
 
@@ -58,7 +66,8 @@ public class NavigationGraph implements GraphADT<Location, Path> {
 	 *            vertex to be added
 	 */
 	public void addVertex(Location vertex) {
-		
+
+		// checks if the vertex is already added, and adds it if not
 		if (getLocationByName(vertex.getName()) == null) {
 			graph.add(new GraphNode<Location, Path>(vertex, ++orig));
 			vertices++;
@@ -78,24 +87,29 @@ public class NavigationGraph implements GraphADT<Location, Path> {
 	 */
 	public void addEdge(Location src, Location dest, Path edge) {
 		// TODO Auto-generated method stub
+
+		// error handling
 		if (getLocationByName(src.getName()) == null || getLocationByName(dest.getName()) == null) {
 			throw new IllegalArgumentException();
 		}
-		
+
 		if (!edge.getSource().equals(src) || !edge.getDestination().equals(dest)) {
 			throw new IllegalArgumentException();
 		}
-		
+
+		// adds the src and dest if they weren't already added
 		if (getGraphNode(src) == null) {
 			addVertex(src);
 		}
-		
+
 		if (getGraphNode(dest) == null) {
 			addVertex(dest);
 		}
-		
+
 		for (int i = 0; i < graph.size(); i++) {
-			
+
+			// looks for a vertex with the same name as src
+			// adds the edge as an our edge from src
 			if (src.getName().equals(graph.get(i).getVertexData().getName())) {
 				GraphNode<Location, Path> tempSrc = graph.get(i);
 				tempSrc.addOutEdge(edge);
@@ -135,9 +149,11 @@ public class NavigationGraph implements GraphADT<Location, Path> {
 		// TODO Auto-generated method stub
 		GraphNode<Location, Path> temp = getGraphNode(src);
 		List<Path> tempPathList = temp.getOutEdges();
-		
+
+		// checks each out edge's destination name for a match with passed
+		// dest's name
 		for (int i = 0; i < tempPathList.size(); i++) {
-			
+
 			if (dest.getName().equals(tempPathList.get(i).getDestination().getName())) {
 				return tempPathList.get(i);
 			}
@@ -214,59 +230,66 @@ public class NavigationGraph implements GraphADT<Location, Path> {
 	 */
 	public List<Path> getShortestRoute(Location src, Location dest, String edgePropertyName) {
 		// TODO Auto-generated method stub
-		
-		int propIndex = 0;
+
+		int index = 0;
 
 		for (int i = 0; i < edgePropertyNames.length; i++) {
+			//sets which index of the edge properties to use (1 for time, 2 for cost)
 			if (edgePropertyName.compareToIgnoreCase(edgePropertyNames[i].toString()) == 0) {
-				propIndex = i;
+				index = i;
 			}
 		}
 
+			//gets the index of the source in graph
 		int srcIndex = graph.indexOf(getGraphNode(src));
+			//creates a wrapper list
 		ArrayList<ShortPathWrapper> wrapperList = new ArrayList<ShortPathWrapper>();
-		
-		for (int i = 0; i < graph.size(); i++) {
+
+		for (int i = 0; i < graph.size(); i++) {	//adds each vertex to the wrapper list
 			wrapperList.add(i, new ShortPathWrapper(graph.get(i), Double.MAX_VALUE));
 		}
-		
+			//creates the queue used in dijkstra's algorithm
 		PriorityQueue<ShortPathWrapper> pq = new PriorityQueue<ShortPathWrapper>();
-		
+			//sets the min distance to 0 per dijkstra's algorithm
 		wrapperList.get(srcIndex).setminDist(0.0);
+			//adds the vertex to the priority queue
 		pq.add(wrapperList.get(srcIndex));
 
-		while (!pq.isEmpty()) {
+		while (!pq.isEmpty()) {	//removes and visits the vertex
 			ShortPathWrapper current = pq.remove();
 			current.setVisited(true);
 
+			//checks if the distance is less than other distances and updates the queue
 			for (Path path : current.getNode().getOutEdges()) {
 				ShortPathWrapper successor = wrapperList.get(getGraphNode(path.getDestination()).getId() - 1);
-				double weight = path.getProperties().get(propIndex);
-				double distanceThroughCur = current.getminDist() + weight;
-				
-				if (distanceThroughCur < successor.getminDist()) {
+				double weight = path.getProperties().get(index);
+				double totalDist = current.getminDist() + weight;
+
+				if (totalDist < successor.getminDist()) {
 					pq.remove(successor);
-					successor.setminDist(distanceThroughCur);
+					successor.setminDist(totalDist);
 					successor.setPrevious(current);
 					pq.add(successor);
 				}
 			}
 		}
 
+		//creates the return path and path of wrappers
 		List<Path> path = new ArrayList<Path>();
 		List<ShortPathWrapper> wrapperPath = new ArrayList<ShortPathWrapper>();
 		int wrapperCount = 0;
-		
-		for (ShortPathWrapper wrapper = wrapperList
-				.get(getGraphNode(dest).getId() - 1); wrapper != null; wrapper = wrapper.getPrevious()) {
+			//counts the number of wrappers
+		for (ShortPathWrapper wrapper = wrapperList.get(getGraphNode(dest).getId() - 1); 
+				wrapper != null; wrapper = wrapper.getPrevious()) {
 			wrapperPath.add(wrapper);
 			wrapperCount++;
 		}
 
+			//goes through the wrapper path and retrieves the min distance to be added to tempList
 		for (int i = 0; i < wrapperCount - 1; i++) {
 			List<Double> tempList = new ArrayList<Double>();
 			boolean runOnce = true;
-			
+
 			for (int j = 0; j < edgePropertyNames.length; j++) {
 
 				if (wrapperPath.get(i).getPrevious().getNode().getId() > 0 && runOnce) {
@@ -276,10 +299,11 @@ public class NavigationGraph implements GraphADT<Location, Path> {
 				}
 				tempList.add(wrapperPath.get(i).getminDist());
 			}
+			//add the next vertex to the path
 			path.add(new Path(wrapperPath.get(i).getPrevious().getNode().getVertexData(),
 					wrapperPath.get(i).getNode().getVertexData(), tempList));
 		}
-
+		//reverses the path so it goes from start to end
 		Collections.reverse(path);
 
 		return path;
@@ -304,7 +328,11 @@ public class NavigationGraph implements GraphADT<Location, Path> {
 	 * @return GraphNode<Location, Path>
 	 */
 	private GraphNode<Location, Path> getGraphNode(Location location) {
-		for (int i = 0; i < graph.size(); i++) {
+
+		for (int i = 0; i < graph.size(); i++) { // searches for the vertex with
+													// locations name and
+													// returns it
+
 			if (graph.get(i).getVertexData().getName().equals(location.getName())) {
 				return graph.get(i);
 			}
