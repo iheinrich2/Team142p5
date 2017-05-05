@@ -52,7 +52,7 @@ public class NavigationGraph implements GraphADT<Location, Path> {
 
 	@Override
 	/**
-	 * Adds a vertex to the Graph
+	 * Adds a vertex to the Graph if it doesn't exist
 	 * 
 	 * @param vertex
 	 *            vertex to be added
@@ -232,7 +232,7 @@ public class NavigationGraph implements GraphADT<Location, Path> {
 		
 		PriorityQueue<ShortPathWrapper> pq = new PriorityQueue<ShortPathWrapper>();
 		
-		wrapperList.get(srcIndex).setMinDistance(0.0);
+		wrapperList.get(srcIndex).setminDist(0.0);
 		pq.add(wrapperList.get(srcIndex));
 
 		while (!pq.isEmpty()) {
@@ -242,12 +242,12 @@ public class NavigationGraph implements GraphADT<Location, Path> {
 			for (Path path : current.getNode().getOutEdges()) {
 				ShortPathWrapper successor = wrapperList.get(getGraphNode(path.getDestination()).getId() - 1);
 				double weight = path.getProperties().get(propIndex);
-				double distanceThroughCur = current.getMinDistance() + weight;
+				double distanceThroughCur = current.getminDist() + weight;
 				
-				if (distanceThroughCur < successor.getMinDistance()) {
+				if (distanceThroughCur < successor.getminDist()) {
 					pq.remove(successor);
-					successor.setMinDistance(distanceThroughCur);
-					successor.setPrev(current);
+					successor.setminDist(distanceThroughCur);
+					successor.setPrevious(current);
 					pq.add(successor);
 				}
 			}
@@ -258,7 +258,7 @@ public class NavigationGraph implements GraphADT<Location, Path> {
 		int wrapperCount = 0;
 		
 		for (ShortPathWrapper wrapper = wrapperList
-				.get(getGraphNode(dest).getId() - 1); wrapper != null; wrapper = wrapper.getPrev()) {
+				.get(getGraphNode(dest).getId() - 1); wrapper != null; wrapper = wrapper.getPrevious()) {
 			wrapperPath.add(wrapper);
 			wrapperCount++;
 		}
@@ -269,14 +269,14 @@ public class NavigationGraph implements GraphADT<Location, Path> {
 			
 			for (int j = 0; j < edgePropertyNames.length; j++) {
 
-				if (wrapperPath.get(i).getPrev().getNode().getId() > 0 && runOnce) {
-					wrapperPath.get(i).setMinDistance(
-							wrapperPath.get(i).getMinDistance() - wrapperPath.get(i).getPrev().getMinDistance());
+				if (wrapperPath.get(i).getPrevious().getNode().getId() > 0 && runOnce) {
+					wrapperPath.get(i).setminDist(
+							wrapperPath.get(i).getminDist() - wrapperPath.get(i).getPrevious().getminDist());
 					runOnce = false;
 				}
-				tempList.add(wrapperPath.get(i).getMinDistance());
+				tempList.add(wrapperPath.get(i).getminDist());
 			}
-			path.add(new Path(wrapperPath.get(i).getPrev().getNode().getVertexData(),
+			path.add(new Path(wrapperPath.get(i).getPrevious().getNode().getVertexData(),
 					wrapperPath.get(i).getNode().getVertexData(), tempList));
 		}
 

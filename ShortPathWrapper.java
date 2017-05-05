@@ -12,17 +12,24 @@
 // Author4: (Mitchel Abts, abts3@wisc.edu, abts3, Lec 003)
 //////////////////////////// 80 columns wide //////////////////////////////////
 
+
+/**
+ * Class that assists with finding the shortest path
+ * 
+ * @author Isaac Heinrich
+ *
+ */
 class ShortPathWrapper implements Comparable<ShortPathWrapper> {
 	private GraphNode<Location, Path> node;
 	private Double weight;
-	private Double minDistance;
+	private Double minDist;
 	private boolean visited;
-	private ShortPathWrapper prev;
+	private ShortPathWrapper Previous;
 
 	public ShortPathWrapper(GraphNode<Location, Path> node, Double weight) {
 		this.node = node;
 		this.weight = weight;
-		this.minDistance = Double.MAX_VALUE;
+		this.minDist = Double.MAX_VALUE;
 		this.visited = false;
 	}
 
@@ -40,18 +47,18 @@ class ShortPathWrapper implements Comparable<ShortPathWrapper> {
 	 * 
 	 * @return the minimum distance
 	 */
-	Double getMinDistance() {
-		return minDistance;
+	Double getminDist() {
+		return minDist;
 	}
 
 	/**
 	 * Sets the minimum distance.
 	 * 
 	 * @param dist
-	 *            the distance length to set minDistance to,
+	 *            the distance length to set minDist to,
 	 */
-	void setMinDistance(Double dist) {
-		minDistance = dist;
+	void setminDist(Double dist) {
+		minDist = dist;
 	}
 
 	/**
@@ -74,22 +81,22 @@ class ShortPathWrapper implements Comparable<ShortPathWrapper> {
 	}
 
 	/**
-	 * Sets the previous vertex.
+	 * Sets the Previousious vertex.
 	 * 
-	 * @param prev
-	 *            the vertex to assign to prev
+	 * @param Previous
+	 *            the vertex to assign to Previous
 	 */
-	void setPrev(ShortPathWrapper prev) {
-		this.prev = prev;
+	void setPrevious(ShortPathWrapper Previous) {
+		this.Previous = Previous;
 	}
 
 	/**
-	 * Returns the previous vertex.
+	 * Returns the Previousious vertex.
 	 * 
-	 * @return prev
+	 * @return Previous
 	 */
-	ShortPathWrapper getPrev() {
-		return prev;
+	ShortPathWrapper getPrevious() {
+		return Previous;
 	}
 
 	/**
@@ -135,11 +142,11 @@ class ShortPathWrapper implements Comparable<ShortPathWrapper> {
 	 * @return int that depends on the comparison
 	 */
 	public int compareTo(ShortPathWrapper o) {
-		if (this.weight > o.getMinDistance())
+		if (this.weight > o.getminDist())
 			return 1;
-		if (this.weight < o.getMinDistance())
+		if (this.weight < o.getminDist())
 			return -1;
-		if (this.weight == o.getMinDistance())
+		if (this.weight == o.getminDist())
 			return 0;
 		return Integer.MAX_VALUE;
 	}

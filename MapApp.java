@@ -1,3 +1,4 @@
+
 /////////////////////////////////////////////////////////////////////////////
 // Semester:         CS367 Spring 2016 
 // PROJECT:          P5
@@ -197,50 +198,64 @@ public class MapApp {
 		// NavigationGraph with vertices and edges
 		String[] line1Array;
 
+		// use the readers to get the graph information file
 		FileReader fr = new FileReader(graphFilepath);
 		BufferedReader br = new BufferedReader(fr);
 
-		try {
+		try { // retrieves each of the categories
 			String firstLine = br.readLine();
 			line1Array = firstLine.split(" ");
 		} catch (IOException excep) {
 			throw new InvalidFileException("File did not contain correct information format");
 		}
 
+		// creates an array with only the number of edge properties
 		String[] edgeProperties = new String[line1Array.length - 2];
 
+		// assigns the array elements to the edge properties of the txt file
 		for (int i = 0; i < edgeProperties.length; i++) {
 			edgeProperties[i] = line1Array[i + 2];
 		}
 
-		NavigationGraph graph = new NavigationGraph(edgeProperties);
+		NavigationGraph graph = new NavigationGraph(edgeProperties); // new
+																		// graph
+																		// with
+																		// edge
+																		// array
 		String[] lineArray = new String[line1Array.length];
 		String line;
 
-		while ((line = br.readLine()) != null) {
+		while ((line = br.readLine()) != null) { // whiles there lines left
 
-			lineArray = line.split(" ");
-			Location firstLoc = new Location(lineArray[0].toLowerCase());
-			Location secondLoc = new Location(lineArray[1].toLowerCase());
-			graph.addVertex(firstLoc);
-			graph.addVertex(secondLoc);
+			lineArray = line.split(" "); // get the vertex names and add them to
+											// the graph
+			Location firstVert = new Location(lineArray[0].toLowerCase());
+			Location secondVert = new Location(lineArray[1].toLowerCase());
+			graph.addVertex(firstVert);
+			graph.addVertex(secondVert);
+
 			ArrayList<Double> pathList = new ArrayList<Double>();
 
-			for (int i = 2; i < lineArray.length; i++) {
+			for (int i = 2; i < lineArray.length; i++) { // gets the edge info
+															// and adds it to
+															// the list
 
 				try {
 					pathList.add(Double.parseDouble(lineArray[i]));
-				} catch (NullPointerException nullie) {
+				} catch (NullPointerException e) {
 					throw new InvalidFileException("Index was messed up");
-				} catch (NumberFormatException numbie) {
+				} catch (NumberFormatException e) {
 					throw new InvalidFileException("Check format of file.");
 				}
 			}
 
-			Path path = new Path(firstLoc, secondLoc, pathList);
-			graph.addEdge(firstLoc, secondLoc, path);
+			// create the path between the vertexes, then add the edge between
+			// them
+			Path path = new Path(firstVert, secondVert, pathList);
+			graph.addEdge(firstVert, secondVert, path);
 		}
 
+		// close them readers folks
 		fr.close();
 		br.close();
 
